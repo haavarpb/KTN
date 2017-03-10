@@ -1,13 +1,18 @@
+# -*- coding: utf-8 -*-
 
-
-class MessageParser():
+class MessageParser(Thread):
     def __init__(self):
+        self.daemon = True
 
         self.possible_responses = {
             'error': self.parse_error,
             'info': self.parse_info,
 	    # More key:values pairs are needed	
         }
+
+    def run(self):
+        pass
+
 
     def parse(self, payload):
         payload = # decode the JSON object

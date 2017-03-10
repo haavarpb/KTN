@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import socket
 from MessageReceiver import MessageReceiver
-from MessageParser import MessageParser
+import sys
+import json
 
 class Client:
     """
@@ -15,27 +16,37 @@ class Client:
 
         # Set up the socket connection to the server
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
-        # TODO: Finish init process with necessary code
+        self.host = host
+        self.server_port = server_port
         self.run()
 
     def run(self):
         # Initiate the connection to the server
         self.connection.connect((self.host, self.server_port))
+
+        while True:
+            data = raw_input("-------------------------------------------------------\n::")
+            if data == 'exit':
+                self.disconnect()
+                sys.exit()
+
+            self.send_payload(str(data))
+
         
     def disconnect(self):
-        # TODO: Handle disconnection
-        pass
-
-    def receive_message(self, message):
-        # TODO: Handle incoming message
-        pass
+        self.send_payload(json.dumps({'request':'logout', 'content': None}))
+        self.connection.shutdown()
+        self.connection.close()
 
     def send_payload(self, data):
-        # TODO: Handle sending of a payload
-        pass
+        splitted = data.split(" ")
+        if len(splitted) == 2:
+            self.connection.sendall(json.dumps({'request': splitted[0], 'content':splitted[1]}))
+        else:
+            self.connection.sendall(json.dumps({'request': 'msg', 'content':data}))
+
         
-    # More methods may be needed!
+    
 
 
 if __name__ == '__main__':
