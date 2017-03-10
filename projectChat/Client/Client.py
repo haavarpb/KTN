@@ -18,14 +18,17 @@ class Client:
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = host
         self.server_port = server_port
+        self.MessageReceiver = MessageReceiver(self, self.connection)
         self.run()
 
     def run(self):
         # Initiate the connection to the server
         self.connection.connect((self.host, self.server_port))
+        self.MessageReceiver.start()
+
 
         while True:
-            data = raw_input("-------------------------------------------------------\n::")
+            data = raw_input("")
             if data == 'exit':
                 self.disconnect()
                 sys.exit()
@@ -34,13 +37,14 @@ class Client:
 
         
     def disconnect(self):
-        self.send_payload(json.dumps({'request':'logout', 'content': None}))
-        self.connection.shutdown()
+        self.send_payload(json.dumps({'request':'logout'}))
         self.connection.close()
 
     def send_payload(self, data):
         splitted = data.split(" ")
-        if len(splitted) == 2:
+        if data.find('help') != -1 or data.find('names') != -1 or data.find('history') != -1 or data.find('logout') != -1:
+            self.connection.sendall(json.dumps({'request': splitted[0]}))
+        elif data.find('login') != -1:
             self.connection.sendall(json.dumps({'request': splitted[0], 'content':splitted[1]}))
         else:
             self.connection.sendall(json.dumps({'request': 'msg', 'content':data}))

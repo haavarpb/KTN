@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from threading import Thread
+import json
 
 class MessageReceiver(Thread):
     """
@@ -12,12 +13,29 @@ class MessageReceiver(Thread):
         """
         This method is executed when creating a new MessageReceiver object
         """
-
+        super(MessageReceiver,self).__init__()
         # Flag to run thread as a deamon
         self.daemon = True
-
-        # TODO: Finish initialization of MessageReceiver
+        self.client = client
+        self.connection = connection
 
     def run(self):
-        # TODO: Make MessageReceiver receive and handle payloads
-        pass
+        while True:
+            s = self.connection.recv(4096)
+            print s
+            r = json.loads(s)
+
+            if r['response'] == 'info' and isinstance(r['content'], list):
+                    dList = r['content']
+                    for d in dList:
+                        print '[Server info] ' + d + "\n"
+            elif r['response'] == 'history':
+                    dList = r['content']
+                    for d in dList:
+                        print '[Server Log] ' + '[' + d['sender'] + '@' + d['timestamp'] + '] ' + d['content'] + "\n"
+            elif r['response'] == 'message':
+                print '[' + r['sender'] + '@' + r['timestamp'] + '] ' + r['content'] + "\n"
+            elif r['response'] == 'error':
+                print '[Server error] ' + r['content'] + "\n"
+            elif r['response'] == 'info':
+                print '[Server info] ' + r['content'] + "\n"

@@ -25,9 +25,12 @@ class ClientHandler(SocketServer.BaseRequestHandler):
         # Loop that listens for messages from the client
         while True:
             received_string = self.connection.recv(4096)
-            received_dict = json.dumps(received_string)
+            received_dict = json.loads(received_string)
             req = received_dict['request']
-            content = received_dict['content']
+            try:
+                content = received_dict['content']
+            except:
+                content = None
 
             if self.server.isLoggedIn(self):
                 if req == 'logout':
@@ -58,7 +61,7 @@ class ClientHandler(SocketServer.BaseRequestHandler):
                     responses = self.error('Access denied. You are not logged in. Type <help> to learn more.')
 
             for response in responses:
-                self.connection.sendall(json.loads(response))
+                self.connection.sendall(json.dumps(response))
 
 
     def login(self, username):
@@ -72,28 +75,26 @@ class ClientHandler(SocketServer.BaseRequestHandler):
         return True
 
     def logout(self, username):
-        self.server.deleteClient(self)
+        self.server.deleteClient(self, username)
 
     def message(self, message, username):
         response = self.response(username, 'message', message)
-        self.logger(json.loads(response))
-        self.server.broadcast(response)
+        self.logger(json.dumps(response))
+        self.server.broadcast(json.dumps(response))
 
     def names(self):
-        return self.server.getNames()
+        return self.response('server', 'info', self.server.getNames(self))
 
     def history(self):
-        historyList = []
-        for jsonString in self.server.getServerHistory():
-            historyList.append(self.response('server','info', jsonString))
-        return historyList
+        return self.response('server','history', self.server.getServerHistory())
+        
 
     def help(self):
         message = "Chat commands:\n"\
         "To log in:                                                  login <username>\n"\
         "To log out (Requires login):                                logout <None>\n"\
         "To get server message-history type (Requires login):        history <None>\n"\
-        "To get a list of logged in users type (Requires login):     names <None> \n"
+        "To get a list of logged in users type (Requires login):     names <None> \n"\
         "To show this list of availible commands again type:         help <None>\n"
         return [self.response('server', 'info', message)]
 
@@ -101,11 +102,11 @@ class ClientHandler(SocketServer.BaseRequestHandler):
         return [self.response('server', 'error', message)]
 
     def timestampAsString(self):
-        return str(time.localtime()[3]) + ":" + str(time.localtime()[4])
+        return str(time.localtime()[3]) + ":" + str(time.localtime()[4]) + "AM"
 
     def response(self, sender, response, content):
         return {
-                'timespamp':self.timestampAsString(),
+                'timestamp':self.timestampAsString(),
                 'sender':sender,
                 'response':response,
                 'content': content
@@ -114,7 +115,7 @@ class ClientHandler(SocketServer.BaseRequestHandler):
     def logger(self, jsonMessage):
         self.server.fileLock.acquire()
         f = open(self.server.file, "a")
-        f.write(jsonMessage+"\n")
+        f.write(jsonMessage + "\n")
         f.close()
         self.server.fileLock.release()
 
@@ -132,7 +133,7 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 
 
     def addClient(self, client, username):
-        self.broadcast(json.loads(self.response('server', 'message', username + ' logged in.')))
+        self.broadcast(json.dumps(client.response('server', 'message', username + ' logged in.')))
         self.connectedClientsLock.acquire()
         self.connectedClients[client] = username
         self.connectedClientsLock.release()
@@ -141,34 +142,35 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
         self.connectedClientsLock.acquire()
         del self.connectedClients[client]
         self.connectedClientsLock.release()
-        self.broadcast(json.loads(self.response('server', 'message', username + ' logged out.')))
+        self.broadcast(json.dumps(client.response('server', 'message', username + ' logged out.')))
         self.shutdown_request(client.request)
         self.close_request(client.request)
 
     def isUserNameTaken(self, username):
         self.connectedClientsLock.acquire()
         if username in self.connectedClients.values():
+            self.connectedClientsLock.release()
             return True
         else:
+            self.connectedClientsLock.release()
             return False
 
     def isLoggedIn(self, client):
         self.connectedClientsLock.acquire()
         if client not in self.connectedClients.keys():
+            self.connectedClientsLock.release()
             return False
+        self.connectedClientsLock.release()
         return True
 
-    def getNames(self):
-        names = []
-        self.connectedClientsLock.acquire()
-        for username in self.connectedClients.values():
-            names.append(self.response('server', 'info', username))
-        return names
+    def getNames(self, client):
+        # Array with names
+        return self.connectedClients.values()
 
     def broadcast(self, message):
         self.connectedClientsLock.acquire()
-        for client, username in self.connectedClients.iteritems():
-            client.connection.sendall(json.loads(message))
+        for client in self.connectedClients.keys():
+            client.connection.sendall(message)
         self.connectedClientsLock.release()
 
     def getServerHistory(self):
@@ -176,7 +178,7 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
         self.fileLock.acquire()
         f = open(self.file, "r")
         for line in f:
-            messageHistory.append(line)
+            messageHistory.append(json.loads(line.strip("\n")))
         self.fileLock.release()
         return messageHistory
 

@@ -1,0 +1,3 @@
+{"content": "hello", "timestamp": "7:56AM", "sender": "haavarpb", "response": "message"}
+{"content": "hello", "timestamp": "7:59AM", "sender": "hei", "response": "message"}
+{"content": "hallo", "timestamp": "8:15AM", "sender": "havaaarr", "response": "message"}
