@@ -43,6 +43,8 @@ class ClientHandler(SocketServer.BaseRequestHandler):
                     responses = self.names()
                 elif req == 'history':
                     responses = self.history()
+                elif req == 'help':
+                    responses = self.help()
                 else:
                     responses = self.error('Invalid message. Type <help> to learn more.')
             else:
@@ -58,10 +60,14 @@ class ClientHandler(SocketServer.BaseRequestHandler):
                 elif req == 'help':
                     responses = self.help()
                 else:
-                    responses = self.error('Access denied. You are not logged in. Type <help> to learn more.')
+                    responses = self.error(
+                        'Access denied. You are not logged in. Type <help> to learn more.'
+                    )
 
             for response in responses:
-                self.connection.sendall(json.dumps(response))
+                payload = json.dumps(response)
+                self.connection.sendall(payload)
+                time.sleep(0.1)
 
 
     def login(self, username):
@@ -83,10 +89,14 @@ class ClientHandler(SocketServer.BaseRequestHandler):
         self.server.broadcast(json.dumps(response))
 
     def names(self):
-        return self.response('server', 'info', self.server.getNames(self))
+        return [self.response('server', 'info', self.server.getNames(self))]
 
     def history(self):
-        return self.response('server','history', self.server.getServerHistory())
+        historyMessage = self.server.getServerHistory() # List of dicts
+        historyList = []
+        for d in historyMessage:
+            historyList.append(self.response('server','history', d))
+        return historyList
         
 
     def help(self):
@@ -102,7 +112,7 @@ class ClientHandler(SocketServer.BaseRequestHandler):
         return [self.response('server', 'error', message)]
 
     def timestampAsString(self):
-        return str(time.localtime()[3]) + ":" + str(time.localtime()[4]) + "AM"
+        return str(time.localtime()[3]) + ":" + str(time.localtime()[4]) + ("AM" if time.localtime()[3] < 12 else "PM")
 
     def response(self, sender, response, content):
         return {

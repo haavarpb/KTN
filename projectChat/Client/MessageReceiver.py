@@ -4,7 +4,8 @@ import json
 
 class MessageReceiver(Thread):
     """
-    This is the message receiver class. The class inherits Thread, something that
+    This is the message receiver class. 
+    The class inherits Thread, something that
     is necessary to make the MessageReceiver start a new thread, and it allows
     the chat client to both send and receive messages at the same time
     """
@@ -22,17 +23,14 @@ class MessageReceiver(Thread):
     def run(self):
         while True:
             s = self.connection.recv(4096)
-            print s
             r = json.loads(s)
 
             if r['response'] == 'info' and isinstance(r['content'], list):
                     dList = r['content']
                     for d in dList:
-                        print '[Server info] ' + d + "\n"
+                        print '[Server info] ' + d
             elif r['response'] == 'history':
-                    dList = r['content']
-                    for d in dList:
-                        print '[Server Log] ' + '[' + d['sender'] + '@' + d['timestamp'] + '] ' + d['content'] + "\n"
+                print '[Server Log] ' + '[' + r['content']['sender'] + '@' + r['content']['timestamp'] + '] ' + r['content']['content']
             elif r['response'] == 'message':
                 print '[' + r['sender'] + '@' + r['timestamp'] + '] ' + r['content'] + "\n"
             elif r['response'] == 'error':

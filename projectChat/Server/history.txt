@@ -1,3 +1,15 @@
-{"content": "hello", "timestamp": "7:56AM", "sender": "haavarpb", "response": "message"}
-{"content": "hello", "timestamp": "7:59AM", "sender": "hei", "response": "message"}
-{"content": "hallo", "timestamp": "8:15AM", "sender": "havaaarr", "response": "message"}
+{"content": "hello herro", "timestamp": "13:54AM", "sender": "herro", "response": "message"}
+{"content": "hello", "timestamp": "PM", "sender": "haavar", "response": "message"}
+{"content": "hello", "timestamp": "14:10PM", "sender": "knut", "response": "message"}
+{"content": "hello", "timestamp": "14:18PM", "sender": "hey", "response": "message"}
+{"content": "info", "timestamp": "14:55PM", "sender": "haak", "response": "message"}
+{"content": "hello", "timestamp": "14:56PM", "sender": "haak", "response": "message"}
+{"content": "clear", "timestamp": "15:5PM", "sender": "skruf", "response": "message"}
+{"content": "hellooo", "timestamp": "15:13PM", "sender": "goodbyeman", "response": "message"}
+{"content": "what boys", "timestamp": "15:14PM", "sender": "goodbyeman", "response": "message"}
+{"content": "not much", "timestamp": "15:14PM", "sender": "helloman", "response": "message"}
+{"content": "hei p\u00e5 deg", "timestamp": "15:20PM", "sender": "hakon", "response": "message"}
+{"content": "hello giuse", "timestamp": "15:32PM", "sender": "kewl", "response": "message"}
+{"content": "zup", "timestamp": "15:33PM", "sender": "haavarpb", "response": "message"}
+{"content": "indahood", "timestamp": "15:33PM", "sender": "haavarpb", "response": "message"}
+{"content": "sup", "timestamp": "15:34PM", "sender": "haavar", "response": "message"}

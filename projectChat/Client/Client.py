@@ -45,7 +45,9 @@ class Client:
         if data.find('help') != -1 or data.find('names') != -1 or data.find('history') != -1 or data.find('logout') != -1:
             self.connection.sendall(json.dumps({'request': splitted[0]}))
         elif data.find('login') != -1:
-            self.connection.sendall(json.dumps({'request': splitted[0], 'content':splitted[1]}))
+            self.connection.sendall(json.dumps(
+                {'request': splitted[0], 'content':splitted[1]})
+            )
         else:
             self.connection.sendall(json.dumps({'request': 'msg', 'content':data}))
 
