@@ -92,11 +92,7 @@ class ClientHandler(SocketServer.BaseRequestHandler):
         return [self.response('server', 'info', self.server.getNames(self))]
 
     def history(self):
-        historyMessage = self.server.getServerHistory() # List of dicts
-        historyList = []
-        for d in historyMessage:
-            historyList.append(self.response('server','history', d))
-        return historyList
+        return [self.response('server','history', self.server.getServerHistory())]
         
 
     def help(self):

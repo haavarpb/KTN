@@ -30,7 +30,9 @@ class MessageReceiver(Thread):
                     for d in dList:
                         print '[Server info] ' + d
             elif r['response'] == 'history':
-                print '[Server Log] ' + '[' + r['content']['sender'] + '@' + r['content']['timestamp'] + '] ' + r['content']['content']
+                dList = r['content']
+                for d in dList:
+                    print '[Server Log]' + '[' + d['sender'] + '@' + d['timestamp'] + ']' + d['content']
             elif r['response'] == 'message':
                 print '[' + r['sender'] + '@' + r['timestamp'] + '] ' + r['content'] + "\n"
             elif r['response'] == 'error':

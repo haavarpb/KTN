@@ -13,3 +13,4 @@
 {"content": "zup", "timestamp": "15:33PM", "sender": "haavarpb", "response": "message"}
 {"content": "indahood", "timestamp": "15:33PM", "sender": "haavarpb", "response": "message"}
 {"content": "sup", "timestamp": "15:34PM", "sender": "haavar", "response": "message"}
+{"content": "ok", "timestamp": "23:3PM", "sender": "haavarp", "response": "message"}
